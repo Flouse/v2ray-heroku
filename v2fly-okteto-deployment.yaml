@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v-fly
+spec:
+  selector:
+    matchLabels:
+      app: v-fly
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: v-fly
+    spec:
+      volumes:
+      - name: install
+        configMap:
+          name: install.sh  
+      - name: config
+        configMap:
+          name: v-config
+      containers:
+        - name: core
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/ash"]
+          args: ["/root/install-release.sh"]
+          # args: ["-c", "while true; do echo hello; sleep 10;done"]
+          resources:
+            requests:
+              cpu: 32m
+              memory: 64Mi
+            limits:
+              cpu: 128m
+              memory: 256Mi
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+          - name: install
+            mountPath: /root
+            # readOnly: true
+          - name: config
+            mountPath: /etc/v2ray/config.json
+            subPath: config.json
+            readOnly: true
+
+---     
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: v-config
+  labels:
+    app: v-fly
+data:
+  config.json: |
+    {
+      "log" : {
+        "loglevel": "debug"
+      },
+      "inbounds": [{
+        "port": 8443,
+        "protocol": "vmess",
+        "disableInsecureEncryption": true,
+        "settings": {
+          "clients": [
+            {
+              "id": "e42d71b7-e943-46c8-9f17-f9c918109bdb",
+              "alterId": 64
+            }
+          ]
+        },
+        "streamSettings": {
+          "network": "ws",
+          "wsSettings": {
+            "path": "/v"
+          }
+        }
+      }],
+      "outbounds": [{
+        "protocol": "freedom",
+        "settings": {}
+      }]
+    }
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: v-fly
+  labels:
+    app: v-fly
+  annotations:
+    dev.okteto.com/auto-ingress: "true"
+spec:
+  ports:
+    - protocol: TCP
+      port: 8443
+      targetPort: 8443
+  selector:
+    app: v-fly
+  type: ClusterIP
+  sessionAffinity: ClientIP

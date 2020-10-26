@@ -1,0 +1,8 @@
+apiVersion: skaffold/v2beta6
+kind: Config
+metadata:
+  name: v-fly
+deploy:
+  kubectl:
+    manifests:
+    - v2fly-okteto-official-image.yaml

@@ -1,0 +1,32 @@
+{
+	"log": {
+		"loglevel": "debug"
+	},
+	"inbounds": [
+		{
+			"port": 8443,
+			"protocol": "vmess",
+			"disableInsecureEncryption": true,
+			"settings": {
+				"clients": [
+					{
+						"id": "e42d71b7-e943-46c8-9f17-f9c918109bdb",
+						"alterId": 64
+					}
+				]
+			},
+			"streamSettings": {
+				"network": "ws",
+				"wsSettings": {
+					"path": "/v"
+				}
+			}
+		}
+	],
+	"outbounds": [
+		{
+			"protocol": "freedom",
+			"settings": {}
+		}
+	]
+}

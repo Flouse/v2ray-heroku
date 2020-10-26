@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: v-fly
+  namespace: flouse
+  selfLink: /apis/apps/v1/namespaces/flouse/deployments/v-fly
+  uid: 9e8ab2e4-10c0-4c9b-bf29-cfe6fc615b87
+  resourceVersion: "809870045"
+  generation: 11
+  creationTimestamp: 2020-08-27T02:46:22Z
+  annotations:
+    deployment.kubernetes.io/revision: "11"
+    kubectl.kubernetes.io/last-applied-configuration: >
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"name":"v-fly","namespace":"flouse"},"spec":{"replicas":1,"selector":{"matchLabels":{"app":"v-fly"}},"template":{"metadata":{"labels":{"app":"v-fly"}},"spec":{"containers":[{"args":["/root/install-release.sh"],"command":["/bin/ash"],"image":"alpine","imagePullPolicy":"IfNotPresent","name":"core","ports":[{"containerPort":8443}],"resources":{"limits":{"cpu":"360m","memory":"64Mi"},"requests":{"cpu":"2m","memory":"1Mi"}},"volumeMounts":[{"mountPath":"/root","name":"install"},{"mountPath":"/etc/v2ray/config.json","name":"config","readOnly":true,"subPath":"config.json"}]}],"volumes":[{"configMap":{"name":"install.sh"},"name":"install"},{"configMap":{"name":"v-config"},"name":"config"}]}}}}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: v-fly
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: v-fly
+    spec:
+      volumes:
+        - name: install
+          configMap:
+            name: install.sh
+            defaultMode: 420
+        - name: config
+          configMap:
+            name: v-config
+            defaultMode: 420
+      containers:
+        - name: core
+          image: alpine
+          command:
+            - /bin/ash
+          args:
+            - /root/install-release.sh
+          ports:
+            - containerPort: 8443
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 128m
+              memory: 64Mi
+            requests:
+              cpu: 2m
+              memory: 1Mi
+          volumeMounts:
+            - name: install
+              mountPath: /root
+            - name: config
+              readOnly: true
+              mountPath: /etc/v2ray/config.json
+              subPath: config.json
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+status:
+  observedGeneration: 11
+  unavailableReplicas: 1
+  conditions:
+    - type: ReplicaFailure
+      status: "True"
+      lastUpdateTime: 2020-09-24T16:57:56Z
+      lastTransitionTime: 2020-09-24T16:57:56Z
+      reason: FailedCreate
+      message: 'pods "v-fly-59bbfc6646-qdrmk" is forbidden: exceeded quota:
+        flouse-quota, requested: requests.cpu=2m, used: requests.cpu=20m,
+        limited: requests.cpu=20m'
+    - type: Available
+      status: "False"
+      lastUpdateTime: 2020-09-24T17:03:21Z
+      lastTransitionTime: 2020-09-24T17:03:21Z
+      reason: MinimumReplicasUnavailable
+      message: Deployment does not have minimum availability.
+    - type: Progressing
+      status: "True"
+      lastUpdateTime: 2020-09-24T17:03:21Z
+      lastTransitionTime: 2020-08-27T02:46:22Z
+      reason: ReplicaSetUpdated
+      message: ReplicaSet "v-fly-59bbfc6646" is progressing.

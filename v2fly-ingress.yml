@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: v-fly
+  namespace: flouse
+  selfLink: /apis/networking.k8s.io/v1beta1/namespaces/flouse/ingresses/v-fly
+  uid: 7e334a98-b311-457a-b1aa-7fd12f8d1241
+  resourceVersion: "809217904"
+  generation: 1
+  creationTimestamp: 2020-08-27T03:02:37Z
+  labels:
+    app: v-fly
+  annotations:
+    cert-manager.io/cluster-issuer: kubesail-letsencrypt
+    certmanager.k8s.io/cluster-issuer: kubesail-letsencrypt
+spec:
+  tls:
+    - hosts:
+        - v.flouse.usw1.kubesail.org
+      secretName: v-fly-ingress
+  rules:
+    - host: v.flouse.usw1.kubesail.org
+      http:
+        paths:
+          - backend:
+              serviceName: v-fly
+              servicePort: 8443
+status:
+  loadBalancer:
+    ingress:
+      - ip: 10.1.3.159
+      - ip: 10.1.3.160
+      - ip: 10.1.3.189
+      - ip: 10.1.3.195
+      - ip: 10.1.3.254
+      - ip: 10.1.4.117
+      - ip: 10.1.4.124
+      - ip: 10.1.4.29
+      - ip: 10.1.4.84
+      - ip: 10.1.4.9
